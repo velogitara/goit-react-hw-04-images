@@ -13,7 +13,6 @@ export default function ModalWindow({ toggleModal, children }) {
     }
   };
   useEffect(() => {
-    console.log('render');
     const handleKeyDown = e => {
       if (e.code === 'Escape') {
         console.log('click');
@@ -23,8 +22,6 @@ export default function ModalWindow({ toggleModal, children }) {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      console.log('willUnmount');
-
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [toggleModal]);

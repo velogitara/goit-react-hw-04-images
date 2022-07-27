@@ -35,7 +35,6 @@ export default function App() {
       imageApi
         .fetchPic(searchQuery, page, getResponse)
         .then(data => {
-          console.log(data.total);
           if (data.total === 0) {
             return Promise.reject(new Error(`нет такого в поиске >>> `));
           }
