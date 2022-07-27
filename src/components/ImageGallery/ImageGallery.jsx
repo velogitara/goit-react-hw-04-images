@@ -4,7 +4,7 @@ import { ImageGalleryList } from './ImageGallery.styled';
 import GalleryItem from '../ImageGalleryItem';
 
 ImageGallery.propTypes = {
-  error: PropTypes.object,
+  error: PropTypes.string,
   status: PropTypes.string.isRequired,
   galleryData: PropTypes.arrayOf(object).isRequired,
 };
@@ -20,8 +20,7 @@ export default function ImageGallery({
   }
 
   if (status === 'rejected') {
-    console.log(error.message);
-    return <ImageGalleryList>{error.message}</ImageGalleryList>;
+    return <ImageGalleryList>{error}</ImageGalleryList>;
   }
 
   if (status === 'resolved') {

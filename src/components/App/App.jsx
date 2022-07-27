@@ -7,116 +7,100 @@ import ModalWindow from '..//ModalWindow';
 import { ContainerApp } from './app.styled';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-export default class App extends Component {
-  state = {
-    searchQuery: '',
-    total: null,
-    hits: null,
-    page: 1,
-    galleryData: [],
-    error: null,
-    status: 'idle',
-    showModal: false,
-    largeImgUrl: '',
-    response: true,
-  };
+export default function App() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [total, setTotal] = useState(null);
+  const [hits, setHits] = useState(null);
+  const [page, setPage] = useState(1);
+  const [galleryData, setGalleryData] = useState([]);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState('idle');
+  const [showModal, setShowModal] = useState(false);
+  const [largeImgUrl, setLargeImgUrl] = useState('');
+  const [response, setResponse] = useState(true);
 
-  componentDidUpdate(prevProps, prevState) {
-    const prevValue = prevState.searchQuery;
-    const nextValue = this.state.searchQuery;
-    const prevPage = prevState.page;
-    const nextPage = this.state.page;
-
-    if (prevValue !== nextValue || prevPage !== nextPage) {
-      setTimeout(() => {
-        imageApi
-          .fetchPic(nextValue, this.state.page, this.getResponse)
-          .then(galleryData => {
-            if (!galleryData.total) {
-              return Promise.reject(new Error(`нет такой херни >>> `));
-            }
-
-            return this.setState(prevState => ({
-              galleryData: [...prevState.galleryData, ...galleryData.hits],
-              status: 'resolved',
-              total: galleryData.total,
-              hits: galleryData.hits.length,
-            }));
-          })
-          .catch(error => this.setState({ error, status: 'rejected' }));
-      }, 500);
+  useEffect(() => {
+    if (!searchQuery) {
+      return;
     }
-  }
+    const getResponse = resp => {
+      if (resp !== response) {
+        setResponse(resp);
+      }
+    };
+    setTimeout(() => {
+      imageApi
+        .fetchPic(searchQuery, page, getResponse)
+        .then(data => {
+          console.log(data.total);
+          if (data.total === 0) {
+            return Promise.reject(new Error(`нет такого в поиске >>> `));
+          }
+          return (
+            setGalleryData(galleryData => [...galleryData, ...data.hits]),
+            setStatus('resolved'),
+            setTotal(data.total),
+            setHits(data.hits.length)
+          );
+        })
+        .catch(error => {
+          setError(error.message);
+          setStatus('rejected');
+        });
+    }, 500);
+  }, [page, response, searchQuery]);
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
-  getQuery = searchQuery => {
-    if (this.state.searchQuery !== searchQuery) {
-      this.setState({
-        searchQuery,
-        page: 1,
-        galleryData: [],
-        status: 'pending',
-      });
+  const getQuery = searchQ => {
+    if (searchQ !== searchQuery) {
+      setSearchQuery(searchQ);
+      setPage(1);
+      setGalleryData([]);
+      setStatus('pending');
+      setHits(null);
+      setTotal(null);
     } else {
       toast.info('its Same Search');
     }
   };
-  getLargeImg = largeImgUrl => {
-    this.setState({
-      largeImgUrl,
-    });
-    this.toggleModal();
-  };
-  getResponse = response => {
-    if (this.state.response !== response) {
-      this.setState({
-        response,
-      });
-    }
+  const getLargeImg = largeImgUrl => {
+    setLargeImgUrl(largeImgUrl);
+    toggleModal();
   };
 
-  handlerClick = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-      response: false,
-      // loader: true,
-    }));
+  const handlerClick = () => {
+    setPage(page => page + 1);
   };
 
-  render() {
-    const { total, hits, status, showModal, response } = this.state;
-    return (
-      <ContainerApp>
-        <SearchBar nameExample={this.getQuery} />
-        <ImageGallery
-          galleryData={this.state.galleryData}
-          status={this.state.status}
-          error={this.state.error}
-          getLargeImg={this.getLargeImg}
-        />
-        {status === 'pending' && <Loader />}
+  return (
+    <ContainerApp>
+      <SearchBar nameExample={getQuery} />
+      <ImageGallery
+        galleryData={galleryData}
+        status={status}
+        error={error}
+        getLargeImg={getLargeImg}
+      />
+      {status === 'pending' && <Loader />}
 
-        {!response && <Loader />}
+      {!response && <Loader />}
 
-        {total > 12 && hits !== total && (
-          <LoadMoreButton onClick={this.handlerClick} />
-        )}
-        {showModal && (
-          <ModalWindow toggleModal={this.toggleModal}>
-            <img src={this.state.largeImgUrl} alt="" />
-          </ModalWindow>
-        )}
+      {total > 12 && hits !== total && (
+        <LoadMoreButton onClick={handlerClick} />
+      )}
+      {showModal && (
+        <ModalWindow toggleModal={toggleModal}>
+          <img src={largeImgUrl} alt="" />
+        </ModalWindow>
+      )}
 
-        <ToastContainer autoClose={3000} position="top-center" closeOnClick />
-      </ContainerApp>
-    );
-  }
+      <ToastContainer autoClose={3000} position="top-center" closeOnClick />
+    </ContainerApp>
+  );
 }
