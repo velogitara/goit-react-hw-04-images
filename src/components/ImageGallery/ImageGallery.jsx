@@ -1,26 +1,28 @@
-import PropTypes, { object } from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { ImageGalleryList } from './ImageGallery.styled';
 import GalleryItem from '../ImageGalleryItem';
 
-ImageGallery.propTypes = {
-  error: PropTypes.string,
-  status: PropTypes.string.isRequired,
-  galleryData: PropTypes.arrayOf(object).isRequired,
-};
 export default function ImageGallery({
   error,
   status,
   galleryData,
-  toggleModal,
   getLargeImg,
 }) {
   if (status === 'idle') {
-    return <ImageGalleryList>Введите слово поиска</ImageGalleryList>;
+    return (
+      <ImageGalleryList>
+        <p>Введите слово поиска</p>
+      </ImageGalleryList>
+    );
   }
 
   if (status === 'rejected') {
-    return <ImageGalleryList>{error}</ImageGalleryList>;
+    return (
+      <ImageGalleryList>
+        <p>{error}</p>
+      </ImageGalleryList>
+    );
   }
 
   if (status === 'resolved') {
@@ -32,7 +34,6 @@ export default function ImageGallery({
               webformatURL={item.webformatURL}
               largeImageURL={item.largeImageURL}
               tags={item.tags}
-              //   showModal={toggleModal}
               getLargeImg={getLargeImg}
             />
           </li>
@@ -41,3 +42,16 @@ export default function ImageGallery({
     );
   }
 }
+
+ImageGallery.propTypes = {
+  error: PropTypes.string,
+  status: PropTypes.string.isRequired,
+  galleryData: PropTypes.arrayOf(
+    PropTypes.shape({
+      webformatURL: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
+    })
+  ),
+  getLargeImg: PropTypes.func.isRequired,
+};

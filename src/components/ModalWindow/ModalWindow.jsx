@@ -36,36 +36,5 @@ export default function ModalWindow({ toggleModal, children }) {
 
 ModalWindow.propTypes = {
   toggleModal: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
 };
-
-// export default class ModalWindow extends Component {
-//   static propTypes = {
-//     toggleModal: PropTypes.func.isRequired,
-//   };
-//   componentDidMount() {
-//     window.addEventListener('keydown', this.handleKeyDown);
-//   }
-//   componentWillUnmount() {
-//     window.removeEventListener('keydown', this.handleKeyDown);
-//   }
-
-//   handleKeyDown = e => {
-//     if (e.code === 'Escape') {
-//       console.log('click');
-//       this.props.toggleModal();
-//     }
-//   };
-//   handelBackdropClick = e => {
-//     if (e.target === e.currentTarget) {
-//       this.props.toggleModal();
-//     }
-//   };
-//   render() {
-//     return createPortal(
-//       <Overlay onClick={this.handelBackdropClick}>
-//         <Modal>{this.props.children}</Modal>
-//       </Overlay>,
-//       modalRoot
-//     );
-//   }
-// }
