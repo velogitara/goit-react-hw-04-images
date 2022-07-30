@@ -26,14 +26,14 @@ export default function App() {
     if (!searchQuery) {
       return;
     }
-    const getResponse = resp => {
-      if (resp !== response) {
-        setResponse(resp);
-      }
-    };
+    // const getResponse = resp => {
+    //   if (resp !== response) {
+    //     setResponse(resp);
+    //   }
+    // };
     setTimeout(() => {
       imageApi
-        .fetchPic(searchQuery, page, getResponse)
+        .fetchPic(searchQuery, page)
         .then(data => {
           if (data.total === 0) {
             return Promise.reject(new Error(`нет такого в поиске >>> `));
@@ -42,15 +42,16 @@ export default function App() {
             setGalleryData(galleryData => [...galleryData, ...data.hits]),
             setStatus('resolved'),
             setTotal(data.total),
-            setHits(data.hits.length)
+            setHits(data.hits.length),
+            setResponse(true)
           );
         })
         .catch(error => {
           setError(error.message);
           setStatus('rejected');
         });
-    }, 500);
-  }, [page, response, searchQuery]);
+    }, 1000);
+  }, [page, searchQuery]);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -75,6 +76,7 @@ export default function App() {
 
   const handlerClick = () => {
     setPage(page => page + 1);
+    setResponse(false);
   };
 
   return (
@@ -90,7 +92,7 @@ export default function App() {
 
       {!response && <Loader />}
 
-      {total > 12 && hits !== total && (
+      {response && total > 12 && hits !== total && (
         <LoadMoreButton onClick={handlerClick} />
       )}
       {showModal && (
