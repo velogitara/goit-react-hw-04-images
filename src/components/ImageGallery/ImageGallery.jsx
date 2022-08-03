@@ -54,4 +54,5 @@ ImageGallery.propTypes = {
     })
   ),
   getLargeImg: PropTypes.func.isRequired,
+  // id: PropTypes.string.isRequired,
 };

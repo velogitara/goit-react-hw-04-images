@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [total, setTotal] = useState(null);
-  const [hits, setHits] = useState(null);
+  // const [hits, setHits] = useState(null);
   const [page, setPage] = useState(1);
   const [galleryData, setGalleryData] = useState([]);
   const [error, setError] = useState(null);
@@ -22,6 +22,9 @@ export default function App() {
   const [largeImgUrl, setLargeImgUrl] = useState('');
   const [response, setResponse] = useState(true);
 
+  // console.log(hits);
+  // console.log(total);
+  // console.log(galleryData);
   useEffect(() => {
     if (!searchQuery) {
       return;
@@ -38,11 +41,12 @@ export default function App() {
           if (data.total === 0) {
             return Promise.reject(new Error(`нет такого в поиске >>> `));
           }
+          // console.log(data);
           return (
             setGalleryData(galleryData => [...galleryData, ...data.hits]),
             setStatus('resolved'),
             setTotal(data.total),
-            setHits(data.hits.length),
+            // setHits(data.hits.length),
             setResponse(true)
           );
         })
@@ -52,6 +56,8 @@ export default function App() {
         });
     }, 1000);
   }, [page, searchQuery]);
+
+  // console.log(galleryData);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -63,7 +69,7 @@ export default function App() {
       setPage(1);
       setGalleryData([]);
       setStatus('pending');
-      setHits(null);
+      // setHits(null);
       setTotal(null);
     } else {
       toast.info('its Same Search');
@@ -92,7 +98,7 @@ export default function App() {
 
       {!response && <Loader />}
 
-      {response && total > 12 && hits !== total && (
+      {total > 12 && galleryData.length !== total && response && (
         <LoadMoreButton onClick={handlerClick} />
       )}
       {showModal && (
